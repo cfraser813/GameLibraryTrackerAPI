@@ -43,5 +43,21 @@ namespace GameLibraryTrackerAPI.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+        [HttpPut("{ID}")]
+        public async Task<IActionResult> UpdateGame(int ID, Games updatedGame)
+        {
+            var game = await _context.Game.FindAsync(ID);
+            if (game == null)
+                return NotFound();
+
+            game.ID = updatedGame.ID;
+            game.Title = updatedGame.Title;
+            game.Genre = updatedGame.Genre;
+            game.ReleaseYear = updatedGame.ReleaseYear;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(game);
+        }    
     }
 }
