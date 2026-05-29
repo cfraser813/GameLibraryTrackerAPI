@@ -8,7 +8,7 @@
         <input type="text" id="genre" placeholder="Genre" />
         <input type="text" id="platform" placeholder="Platform" />
         <input type="number" id="releaseYear" placeholder="Release Year" />
-        <button onclick="addGame()",>Add Game</button>
+        <button id="submitBtn" onclick="editingId ? updateGame() : addGame()">Add Game</button>
 
         <script>
             //read
@@ -26,6 +26,7 @@
                             <p>Platform: ${game.platform}</p>
                             <p>Release Year: ${game.releaseYear}</p>
                             <button onclick="deleteGame(${game.id})">Delete</button>
+                            <button onclick="editGame(${game.id}, '${game.title}', '${game.genre}', '${game.platform}', ${game.releaseYear})">Edit</button>
                             <hr>
                         `;
                         container.appendChild(div);
@@ -65,6 +66,43 @@
                     method: 'DELETE'
                 })
                 .then(() => loadGames());
+            }
+
+            let editingId = null;
+
+            function editGame(ID, title, genre, platform, releaseYear) {
+                editingId = ID;
+                document.getElementById('title').value = title;
+                document.getElementById('genre').value = genre;
+                document.getElementById('platform').value = platform;
+                document.getElementById('releaseYear').value = releaseYear;
+            }
+
+            function updateGame() {
+                const game = {
+                    id: editingId,
+                    title: document.getElementById('title').value,
+                    genre: document.getElementById('genre').value,
+                    platform: document.getElementById('platform').value,
+                    releaseYear: parseInt(document.getElementById('releaseYear').value)
+                };
+                fetch(`https://localhost:7256/api/Games/${editingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(game)
+                })
+                .then(response => response.json())
+                .then(() => {
+                    editingId = null;
+                    document.getElementById('submitBtn').textContent = 'Add Game';
+                    loadGames();
+                    document.getElementById('title').value = '';
+                    document.getElementById('genre').value = '';
+                    document.getElementById('platform').value = '';
+                    document.getElementById('releaseYear').value = '';
+                });
             }
         </script>
         <div id="games-list"></div>
